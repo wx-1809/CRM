@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import User
 
 # Create your views here.
@@ -269,6 +269,59 @@ def settings(request):
 
         except Exception as e:
             return JsonResponse({'code':400,'msg':'操作失败'})
+
+#退出登录/安全退出
+def logout(request):
+    #清楚session
+    request.session.flush()
+    #重定向登录
+    return redirect('system:login')
+
+#修改密码
+@xframe_options_exempt
+def password(request):
+    """修改密码"""
+    if request.method == 'GET':
+        #跳转修改密码页面
+        return render(request,'password.html')
+
+    if request.method == 'POST':
+        try:
+            # 获取新旧密码
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            # 从 session 中获取登录账号信息
+            session_user = request.session.get('user')
+            # 获取 id
+            id = session_user['id']
+            # 根据 id 查询用户信息
+            user = User.objects.values().filter(isValid=1, id=id)[0]
+            # 使用用户输入的旧密码 + 盐加密以后和数据库密码进行匹配
+            # md5 + 盐将用户输入的旧密码加密
+            md5_password = md5((old_password + user['salt']).encode(encoding='utf-8')).hexdigest()
+            # 旧密码不匹配，返回错误提示
+            if user['password'] != md5_password:
+                return JsonResponse({'code': 400, 'msg': '旧的密码输入错误'})
+            # 旧密码匹配，修改密码
+            # 准备盐
+            salt = generate_code()
+            # md5 + 盐进行新密码加密
+            md5_password = md5((new_password + salt).encode(encoding='utf-8')).hexdigest()
+            # 根据 id 查询，然后修改密码
+            User.objects.filter(id=id).update(password=md5_password, salt=salt,
+                                              updateDate=datetime.now())
+            return JsonResponse({'code': 200, 'msg': '操作成功'})
+
+        except Exception as e:
+            return JsonResponse({'code':400,'msg':'操作失败'})
+
+
+
+
+
+
+
+
 
 
 

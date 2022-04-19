@@ -15,5 +15,7 @@ urlpatterns = [
     path('captcha/', views.generate_captcha, name='captcha'),
     path('audit_account/',views.audit_account, name='audit_account'),
     path('user_list/',views.select_user_list, name='select_user_list'),
-    path('settings/',views.settings,name='settings')
+    path('settings/',views.settings,name='settings'),
+    path('logout/',views.logout,name='logout'),
+    path('password/',views.password,name='password'),
 ]
