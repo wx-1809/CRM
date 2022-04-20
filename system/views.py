@@ -331,7 +331,7 @@ def module_index(request):
 
 
 @require_GET
-def slelct_module(request):
+def select_module(request):
     """查询所有模块信息"""
     try:
         #查询
@@ -417,6 +417,8 @@ def index_init(request):
     context['menuInfo'] = menuInfo
 
     return JsonResponse(context)
+
+
 
 
 
