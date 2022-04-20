@@ -1,7 +1,7 @@
 {
   "homeInfo": {
     "title": "首页",
-    "href": "welcome"
+    "href": "index"
   },
   "logoInfo": {
     "title": "CRM-智能办公",
@@ -151,7 +151,7 @@
         },
         {
           "title": "菜单管理",
-          "href": "",
+          "href": "module",
           "icon": "fa fa-window-maximize",
           "target": "_self"
         }

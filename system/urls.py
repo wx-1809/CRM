@@ -18,4 +18,10 @@ urlpatterns = [
     path('settings/',views.settings,name='settings'),
     path('logout/',views.logout,name='logout'),
     path('password/',views.password,name='password'),
+    #权限管理
+    path('module/', views.module_index, name='module_index'),
+    path('module/list/',views.slelct_module,name='select_module'),
+
+    path('init/', views.index_init,name='index_init'),
+
 ]

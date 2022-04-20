@@ -44,8 +44,12 @@
       <!--手机端头部菜单-->
       <ul class="layui-nav layui-layout-left layuimini-header-menu layuimini-mobile-show">
         <li class="layui-nav-item">
-          <a href="javascript:;"><i class="fa fa-list-ul"></i> 选择模块</a>
+          <a href="javascript:;">
+            <i class="fa fa-list-ul">选择模块</i>
+
+          </a>
           <dl class="layui-nav-child layuimini-menu-header-mobile">
+
           </dl>
         </li>
       </ul>
@@ -63,9 +67,9 @@
         </li>
         <li class="layui-nav-item layuimini-setting">
           <a href="javascript:;">
-            {# 判断session中是否存在user #}
+            {# 判断 session 中是否存在 user #}
             {% if request.session.user %}
-              {{request.session.user.username }} {# 输出username的值 #}
+              {{ request.session.user.username }} {# 输出 useranme 的值 #}
             {% endif %}
           </a>
           <dl class="layui-nav-child">
@@ -98,7 +102,9 @@
 
   <!--初始化加载层-->
   <div class="layuimini-loader">
-    <div class="layuimini-loader-inner"></div>
+    <div class="layuimini-loader-inner">
+
+    </div>
   </div>
 
   <!--手机端遮罩层-->
@@ -146,7 +152,7 @@
         miniTongji = layui.miniTongji;
 
     var options = {
-      iniUrl: "{% static 'api/init.json' %}",    // 初始化接口
+      iniUrl: "{% static 'api/init.json' %}",    // 初始化接口 {% url 'system:index_init' %}  {% static 'api/init.json' %}
       clearUrl: "{% static 'api/clear.json' %}", // 缓存清理接口
       urlHashLocation: true,      // 是否打开hash定位
       bgColorDefault: false,      // 主题默认配置

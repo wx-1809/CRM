@@ -10,6 +10,8 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET
 from django.shortcuts import render, redirect
 from .models import User
+from .models import Module
+from .models import Permission
 
 # Create your views here.
 #注册账号
@@ -174,7 +176,7 @@ def audit_account(request):
     if request.method == 'POST':
         try:
             #接收参数
-            ids = request.POST.get('ids')
+            ids = request.POST.get('id')
             state = request.POST.get('state')
             #修改状态信息，0未审核 1审核通过 -1黑名单
             User.objects.filter(id__in=ids).update(state=state, updateDate=datetime.now())
@@ -188,6 +190,7 @@ def select_user_list(request):
     """查询所有账号信息"""
     try:
         #获得第几页
+        # page_num = request.GET.get('page')
         page_num = request.GET.get('page')
         #获取每页多少条
         page_size = request.GET.get('limit')
@@ -196,22 +199,24 @@ def select_user_list(request):
         #获取审核状态
         state = request.GET.get('state')
         #查询所有账号信息，如果有条件，待条件查询
+        # user_list = None
         user_list = None
         if username and state:
-            user_list = User.objects.values().filter(isValid=1,
-                                                     username__icontains=username,
-                                                     state=state).all.order_by('-id')
+            user_list = User.objects.values().filter(isValid=1, username__icontains=username,
+                                                     state=state).all().order_by('-id')
         elif username:
-            user_list = User.objects.values().filter(isValid=1,username__icontains=username).all.order_by('-id')
-
+            user_list = User.objects.values().filter(isValid=1, username__icontains=username).all().order_by('-id')
         elif state:
-            user_list = User.objects.values().filter(isValid=1,
-                                                     state=state).all.order_by('-id')
+            user_list = User.objects.values().filter(isValid=1, state=state).all().order_by('-id')
+
         else:
-            user_list = User.objects.values().filter(isValid=1).all.order_by('-id')
+            user_list = User.objects.values().filter(isValid=1).all().order_by('-id')
+
         #初始化分页对象
+        # p = Paginator(user_list, page_size)
         p = Paginator(user_list, page_size)
         #获取指定页数的数据
+        # data = p.page(page_num).object_list
         data = p.page(page_num).object_list
         #返回总条数
         count = p.count
@@ -223,8 +228,10 @@ def select_user_list(request):
             'data':list(data)
 
         }
-
+        # context = {'code': 0, 'msg': '', 'count': count, 'data': list(data)}
         return JsonResponse(context)
+
+
 
     except Exception as e:
         return JsonResponse({'code':400,'msg':'error'})
@@ -315,13 +322,101 @@ def password(request):
         except Exception as e:
             return JsonResponse({'code':400,'msg':'操作失败'})
 
+#权限管理----查询菜单
+@xframe_options_exempt
+@require_GET
+def module_index(request):
+    """菜单管理首页"""
+    return render(request,'module/module.html')
 
 
+@require_GET
+def slelct_module(request):
+    """查询所有模块信息"""
+    try:
+        #查询
+        #{‘模块属性名’：‘select DATE_FORMAT(数据库列名，’格式化样式‘)}
+        select = {'createDate':"select DATE_FORMAT(create_date,'%%Y-%%m-%%d %%H:%%i:%%s')",
+                  'updateDate':"select DATE_FORMAT(update_date,'%%Y-%%m-%%d %%H:%%i:%%s')"}
+        #如果使用后台格式化日期，必须将要格式化的列展示在values()参数中
+        queryset = Module.objects.extra(select=select).values('id','parent','module_name','module_style',
+                                       'grade','opt_value','url','update_date').order_by('id').all()
+
+        return JsonResponse(list(queryset), safe=False)
+    except Exception as e:
+        pass
 
 
+@require_GET
+def index_init(request):
+    """首页菜单初始化"""
+    context = {
+        "homeInfo":{
+            "title":"首页",
+            "href":"welcome"
+        },
+        "logoInfo":{
+            "title":"CRM-智能办公",
+            "image":"static/images/logo.png",
+            "href":""
+        }
+    }
+    #初始菜单
+    menuInfo = []
+    #查询所有一级菜单
+    first_module = Module.objects.values('id','moduleName','moduleStyle','url','orders')\
+                                    .filter(grade=0).order_by('orders').all()
 
+    # first_module = Module.objects.values('id', 'module_name', 'module_style', 'url', 'orders')\
+    #               .filter(grade=0).order_by('orders').all()
 
+    #从session获取当前用户信息
+    user = request.session.get('user')
+    u = User.objects.get(id=user['id'])
+    #获取用户的所有角色ID
+    # role_id = u.roles.values_list('id',flat=True).all()
+    role_id = u.roles.values_list('id', flat=True).all()
+    #根据角色ID查询模块ID
+    # module_id = Permission.objects.values_list('module',flat=True).filter(role__id__in=role_id)
 
+    module_id = Permission.objects.values_list('module', flat=True).filter(role__id__in=role_id)
+
+    for m1 in first_module:
+        if m1['id'] not in module_id:
+            continue
+        #初始化一级菜单
+        first = {
+            "title": m1['moduleName'],
+            "icon": m1['moduleStyle'],
+            "href": m1['url'],
+            "target": "_self"
+        }
+        #将一级菜单添加至菜单数组
+        menuInfo.append(first)
+        #初始化子菜单数组
+        child = []
+        # 查询当前菜单的的下级菜单
+        second_module = Module.objects.values('id','moduleName','moduleStyle','url')\
+                                            .filter(parent=m1['id']).order_by('id').all()
+
+        for m2 in second_module:
+            if m2['id'] not in module_id:
+                continue
+            second = {
+                "title": m2['moduleName'],
+                "icon": m2['moduleStyle'],
+                "href": m2['url'],
+                "target": "_self"
+            }
+            #将二级菜单添加至菜单数组
+            child.append(second)
+
+        #将子菜单数组添加至父采单
+        first['child'] = child
+
+    context['menuInfo'] = menuInfo
+
+    return JsonResponse(context)
 
 
 
