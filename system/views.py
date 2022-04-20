@@ -176,7 +176,7 @@ def audit_account(request):
     if request.method == 'POST':
         try:
             #接收参数
-            ids = request.POST.get('id')
+            ids = request.POST.get('ids')
             state = request.POST.get('state')
             #修改状态信息，0未审核 1审核通过 -1黑名单
             User.objects.filter(id__in=ids).update(state=state, updateDate=datetime.now())
@@ -339,11 +339,11 @@ def select_module(request):
         select = {'createDate':"select DATE_FORMAT(create_date,'%%Y-%%m-%%d %%H:%%i:%%s')",
                   'updateDate':"select DATE_FORMAT(update_date,'%%Y-%%m-%%d %%H:%%i:%%s')"}
         #如果使用后台格式化日期，必须将要格式化的列展示在values()参数中
-        queryset = Module.objects.extra(select=select).values('id','parent','module_name','module_style',
-                                       'grade','opt_value','url','update_date').order_by('id').all()
+        queryset = Module.objects.extra(select=select).values('id','parent','moduleName','moduleStyle',
+                                       'grade','optValue','url','createDate','updateDate').order_by('id').all()
 
         return JsonResponse(list(queryset), safe=False)
-    except Exception as e:
+    except Module.DoesNotExist as e:
         pass
 
 
@@ -417,8 +417,6 @@ def index_init(request):
     context['menuInfo'] = menuInfo
 
     return JsonResponse(context)
-
-
 
 
 
