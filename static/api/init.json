@@ -145,7 +145,7 @@
         },
         {
           "title": "角色管理",
-          "href": "",
+          "href": "role",
           "icon": "fa fa-street-view",
           "target": "_self"
         },

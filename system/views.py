@@ -7,11 +7,13 @@ from captcha.image import ImageCaptcha
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
 from django.shortcuts import render, redirect
 from .models import User
 from .models import Module
 from .models import Permission
+from .models import Role
 
 # Create your views here.
 #注册账号
@@ -176,7 +178,7 @@ def audit_account(request):
     if request.method == 'POST':
         try:
             #接收参数
-            ids = request.POST.get('ids')
+            ids = request.POST.get('id')
             state = request.POST.get('state')
             #修改状态信息，0未审核 1审核通过 -1黑名单
             User.objects.filter(id__in=ids).update(state=state, updateDate=datetime.now())
@@ -347,6 +349,219 @@ def select_module(request):
         pass
 
 
+
+#权限管理----添加/修改菜单
+@xframe_options_exempt
+@require_GET
+def module_create_or_update(request):
+    """添加/修改菜单页面"""
+    #获取grade和parentId
+    grade = request.GET.get('grade')
+    parentId = request.GET.get('parentId')
+    context={
+        'grade':grade,
+        'parentId':parentId
+    }
+    #获取id如果存在的话说明是修改
+    id = request.GET.get('id')
+    if id:
+        module = Module.objects.get(pk=id)
+        context['module'] = module
+        context['parentId'] = module.parent_id
+
+    return render(request,'module/add_update.html',context)
+
+@csrf_exempt
+@require_POST
+def create_module(request):
+    """添加模块信息"""
+    try:
+        #接收参数
+        data = request.POST.dict()
+        data.pop('id')
+        #如果权限值已存在，提示错误
+        optValue = data.get('optValue')
+        Module.objects.get(optValue=optValue)
+        return JsonResponse({'code':400, 'msg':'权限值已存在'})
+    except Module.DoesNotExist as e:
+        pass
+
+    #如果有父级菜单查询父级对象插入
+    parentId = data.pop('parentId')
+    if parentId and parentId == '-1':
+        pass
+    else:
+        p = Module.objects.get(pk=parentId)
+        data['parent'] = p
+
+    #添加数据
+    Module.objects.create(**data)
+    return JsonResponse({'code':200,'msg':'添加成功'})
+
+
+@csrf_exempt
+@require_POST
+def update_module(request):
+    """修改模块信息"""
+    try:
+        #接收参数
+        data = request.POST.dict()
+        data.pop('parentId')
+        id = data.pop('id')
+
+        #如果权限值被修改，判断是否存在，已存在，提示错误
+        optValue = data.get('optValue')
+        #查询原来的模块信息
+        m = Module.objects.get(pk=id)
+        #判断是否权限值被修改
+        if optValue != m.optValue:
+            #判断是否存在
+            Module.objects.get(optValue=optValue)
+            return JsonResponse({'code':400,'msg':'权限值已存在'})
+
+    except Module.DoesNotExist as e:
+        pass
+
+    #添加数据
+    Module.objects.create(**data)
+    return JsonResponse({'code':200,'msg':'添加成功'})
+
+
+#删除模块
+@csrf_exempt
+@require_POST
+def delete_module(request):
+    """删除模块信息"""
+    try:
+        #接收参数
+        id = request.POST.get('id')
+        #查询是否有子项
+        Module.objects.get(parent=id)
+        return JsonResponse({'code':400, 'msg':'请先删除子项'})
+        # pass
+    except Module.DoesNotExist as e:
+        pass
+
+    #删除模块
+    Module.objects.filter(pk=id).delete()
+    return JsonResponse({'code':200,'msg':'删除成功'})
+
+#角色管理----查询角色
+@xframe_options_exempt
+@require_GET
+def role_index(request):
+    """角色管理首页"""
+    return render(request,'role/role.html')
+
+@require_GET
+def select_role(requset):
+    """查询所有角色信息"""
+    try:
+        #获取第几页
+        page_num = requset.GET.get('page',1)#添加默认值，防止没有参数导致异常错误
+        #获取每页多少条
+        page_size = requset.GET.get('limit',10)#添加默认值，防止没有参数导致异常错误
+        #查询
+        #{‘模型属性名’：‘select DATE_FORMAT(数据库列明，‘格式化样式’)’}
+        select = {'createDate':"select DATE_FORMAT(create_date,'%%Y-%%m-%%d %%H:%%i:%%s')",
+                  'updateDate':"select DATE_FORMAT(update_date,'%%Y-%%m-%%d %%H:%%i:%%s')"}
+        #如果使用后台格式化日期，必须将要格式化列展示在valus()参数中
+        queryset = Role.objects.extra(select=select).values('id','roleName','roleRemark',
+                                    'createDate','updateDate').order_by('id').all()
+        #待条件查询
+        roleName = requset.GET.get('rolename')
+        if roleName:
+            queryset = queryset.filter(roleName__icontains=roleName)
+        #初始化分页对象
+        p = Paginator(queryset,page_size)
+        #获取指定页数的数据
+        data = p.page(page_num).object_list
+        #返回总条数
+        count = p.count
+        #返回数据，按照layuimini要求格式构建
+        context = {
+            'code':0,
+            'msg':'',
+            'count':count,
+            'data':list(data)
+        }
+
+        return JsonResponse(context)
+        # pass
+    except Module.DoesNotExist as e:
+        pass
+
+#添加/修改角色
+@xframe_options_exempt
+@require_GET
+def role_create_or_update(request):
+    """添加/修改角色页面"""
+    #获取角色主键
+    id = request.GET.get('id')
+    context = None
+    if id:
+        context = {'role':Role.objects.get(pk=id)}
+    return render(request, 'role/add_update.html', context)
+
+@csrf_exempt
+@require_POST
+def create_role(request):
+    """添加角色信息"""
+    try:
+        #接收参数
+        data = request.POST.dict()
+        data.pop('id')
+        #如果角色已存在提示错误
+        roleName = data.get('roleName')
+        Role.objects.get(roleName=roleName)
+        return JsonResponse({'code':400,'msg':'角色已存在'})
+        # pass
+    except Role.DoesNotExist as e:
+        pass
+
+@csrf_exempt
+@require_POST
+def update_role(request):
+    """更新角色信息"""
+    try:
+        #接收参数
+        data = request.POST.dict()
+        id = data.pop('id')
+        #如果角色被修改，判断是否存在，已存在，提示错误
+        roleName = data.get('roleName')
+        #查询原来的角色信息
+        r = Role.objects.get(pk=id)
+        #判断角色是否被修改
+        if roleName != r.roleName:
+            #判断是否存在
+            Role.objects.get(roleName=roleName)
+            return JsonResponse({'code':400,'msg':'角色名已存在'})
+
+        # pass
+    except Role.DoesNotExist as e:
+        pass
+
+    #修改数据
+    data['updateDate'] = datetime.now()
+    Role.objects.filter(pk=id).update(**data)
+    return JsonResponse({'code':200,'msg':'修改成功'})
+
+
+#角色授权
+@xframe_options_exempt
+@require_GET
+def role_grant(request):
+    """跳转角色授权页面"""
+    #获取角色主键
+    id = request.GET.get('id')
+    context = {'id':id}
+    return render(request,'role/grant.html',context)
+
+
+
+
+
+#修改登录index界面，即将index界面初始化
 @require_GET
 def index_init(request):
     """首页菜单初始化"""
@@ -417,6 +632,12 @@ def index_init(request):
     context['menuInfo'] = menuInfo
 
     return JsonResponse(context)
+
+
+
+
+
+
 
 
 
