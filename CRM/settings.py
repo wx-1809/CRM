@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'CRM.common.URLMiddleware',#URL访问过滤
+    'CRM.common.ExceptionMiddleware',#全局异常处理
 ]
 
 ROOT_URLCONF = 'CRM.urls'

@@ -10,10 +10,13 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 from django.shortcuts import render, redirect
+
+from CRM.common import Message
 from .models import User
 from .models import Module
 from .models import Permission
 from .models import Role
+from .models import UserRole
 
 # Create your views here.
 #注册账号
@@ -178,7 +181,7 @@ def audit_account(request):
     if request.method == 'POST':
         try:
             #接收参数
-            ids = request.POST.get('id')
+            ids = request.POST.get('ids')
             state = request.POST.get('state')
             #修改状态信息，0未审核 1审核通过 -1黑名单
             User.objects.filter(id__in=ids).update(state=state, updateDate=datetime.now())
@@ -201,7 +204,7 @@ def select_user_list(request):
         #获取审核状态
         state = request.GET.get('state')
         #查询所有账号信息，如果有条件，待条件查询
-        # user_list = None
+
         user_list = None
         if username and state:
             user_list = User.objects.values().filter(isValid=1, username__icontains=username,
@@ -215,10 +218,10 @@ def select_user_list(request):
             user_list = User.objects.values().filter(isValid=1).all().order_by('-id')
 
         #初始化分页对象
-        # p = Paginator(user_list, page_size)
+
         p = Paginator(user_list, page_size)
         #获取指定页数的数据
-        # data = p.page(page_num).object_list
+
         data = p.page(page_num).object_list
         #返回总条数
         count = p.count
@@ -230,10 +233,8 @@ def select_user_list(request):
             'data':list(data)
 
         }
-        # context = {'code': 0, 'msg': '', 'count': count, 'data': list(data)}
+
         return JsonResponse(context)
-
-
 
     except Exception as e:
         return JsonResponse({'code':400,'msg':'error'})
@@ -547,7 +548,7 @@ def update_role(request):
     return JsonResponse({'code':200,'msg':'修改成功'})
 
 
-#角色授权
+#角色授权---角色内容
 @xframe_options_exempt
 @require_GET
 def role_grant(request):
@@ -557,7 +558,262 @@ def role_grant(request):
     context = {'id':id}
     return render(request,'role/grant.html',context)
 
+@require_GET
+def select_role_module(request):
+    """查询所有权限及当前角色所拥有的权限"""
+    #获得角色主键
+    roleId = request.GET.get('id')
+    #查询所有权限(模块)
+    module = list(Module.objects.values('id','parent','moduleName').all())
+    #查询角色已拥有的权限(资源)
+    roleModule = Permission.objects.values_list('module',flat=True).filter(role__id=roleId).all()
+    #设置checked
+    for m in module:
+        if m.get('id') in roleModule: #数据库的字段名
+            m['checked'] = 'true'
+        else:
+            m['checked'] = 'false'
 
+    #返回数据
+    return JsonResponse(module, safe=False)
+
+@csrf_exempt
+@require_POST
+def role_relate_module(request):
+    """角色关联模块"""
+    try:
+        #接收参数
+        module_checked_id = request.POST.get('module_checked_id')
+        role_id = request.POST.get('role_id')
+        #删除该角色拥有的所有权限
+        Permission.objects.filter(role__id=role_id).delete()
+        #如果模块为空，则直接return
+        if not module_checked_id:
+            return JsonResponse({'code':200,'msg':'操作成功'})
+
+        #查询角色和模块
+        role = Role.objects.get(pk=role_id)
+        module = Module.objects.filter(pk__in=module_checked_id.split(',')).all() #以‘,’分隔获得相应的内容；
+        #循环插入数据
+        for m in module:
+            Permission.objects.create(role=role,module=m)
+        # return JsonResponse({'code':200,'msg':'操作成功'})
+        return JsonResponse(Message(msg='操作成功').result())
+    except Exception as e:
+        # return JsonResponse({'code':400, 'msg':'操作失败'})
+        return JsonResponse(Message(code=400, msg='操作失败').result())
+
+
+#用户管理
+#查询用户
+@xframe_options_exempt
+@require_GET
+def user_index(request):
+    """用户管理首页"""
+    return render(request, 'user/user.html')
+
+@require_GET
+def select_user(request):
+    """查询用户的所有信息"""
+    try:
+        #获取第几页
+        page_num = request.GET.get('page',1)
+        #获取每页多少条
+        page_size = request.GET.get('limit', 10)
+        #查询
+        #{‘模型属性名’：‘select DATE_FORMAT(数据库列名，‘’格式化样式)’}
+        select = {'create_date':"select DATE_FORMAT(create_date,'%%Y-%%m-%%d %%H:%%i:%%s')",
+                  'update_date':"select DATE_FORMAT(create_date,'%%Y-%%m-%%d %%H:%%i:%%s')"}
+        #如果后台使用格式化日期，必须将要格式化的列展示在values()参数中
+        queryset = User.objects.extra(select=select).values('id','username','truename','email','phone',
+                                                            'create_date','update_date').order_by('-id').all()
+        #接收参数，按条件查询
+        username = request.GET.get('username')
+        if username:
+            queryset = queryset.filter(username__icontains=username)
+        email = request.GET.get('email')
+        if email:
+            queryset = queryset.filter(email__icontains=email)
+        phone = request.GET.get('phone')
+        if phone:
+            queryset = queryset.filter(phone__icontains=phone)
+        #初始化分页对象
+        p = Paginator(queryset, page_size)
+        #获取指定页数的数据
+        data = p.page(page_num).object_list
+        #返回总条数
+        count = p.count
+        #返回数据，按照layuimini要求格式构建
+        context = {
+            'code': 0,
+            'msg':'',
+            'count':count,
+            'data':list(data)
+        }
+
+        return JsonResponse(context)
+        # pass
+    except User.DoesNotExist as e:
+        pass
+
+#添加用户
+@xframe_options_exempt
+@require_GET
+def user_create_or_update(request):
+    """跳转添加或修改用户界面"""
+    #获取用户主键
+    id = request.GET.get('id')
+    context = None
+    if id:
+        context = {'user': User.objects.get(id=id)}
+
+    return render(request,'user/add_update.html',context)
+
+@require_GET
+def select_role_for_user(request):
+    """用户管理查询角色"""
+    try:
+        #查询所有角色
+        role = Role.objects.values('id','roleName').all().order_by('id')
+        #返回数据
+        context = {'role':list(role)}
+        #获取用户主键
+        id  = request.GET.get('id')
+        if id:
+            #查询用户所有角色
+            roleIds = UserRole.objects.values_list('role',flat=True).filter(user__id=id).all()
+            userRole = Role.objects.values('id','roleName').filter(pk__in=roleIds).all()
+            context['userRole'] = list(userRole)
+
+        return JsonResponse(context, safe=False)
+    except Role.DoesNotExist as e:
+        pass
+
+
+@csrf_exempt
+@require_POST
+def create_user(request):
+    """添加用户信息"""
+    try:
+        #接收参数
+        data = request.POST.dict()
+        # print(data)
+        data.pop('id')
+        #如果用户名已存在，提示错误
+        username = data.get('username')
+        User.objects.get(username=username)
+
+        return  JsonResponse({'code':400,'msg':'该用户已存在'})
+    except User.DoesNotExist as e:
+        pass
+
+    try:
+        #如果邮箱已存在，提示错误
+        email = data.get('email')
+        User.objects.get(email=email)
+
+        return JsonResponse({'code':400, 'msg':'邮箱已存在，请重新添加'})
+    except User.DoesNotExist as e:
+        pass
+
+
+    #加密密码
+    #使用md5加密
+    data['password'] = md5('123456'.encode(encoding='utf-8')).hexdigest()
+    # role_ids = data.pop('select')
+    # print('11111111111111111111111111111111111111111111111111111')
+    # print(data.pop('select'))
+    role_ids = data.pop('select') #有bug
+    #添加数据
+    user = User.objects.create(**data)
+    """
+    #插入用户角色中间表
+    if len(role_ids) > 0:
+        roles = Role.objects.filter(pk__in=role_ids.split(',')).all()
+        for role in roles:
+            UserRole.objects.create(user=user, role=role)
+    """
+    #插入用户角色中间表
+    result = create_userrole(role_ids,user,is_create=True)
+
+    return JsonResponse(result)
+
+def create_userrole(role_ids,user,is_create=False):
+    """添加用户角色中间表"""
+    if not is_create:
+        #删除所有该用户的角色
+        #user.userrole_set.all().delete()
+        UserRole.objects.filter(user__id=user.id).delete()
+    if len(role_ids) > 0:
+        roles = Role.objects.filter(pk__in=role_ids.split(',')).all()
+        for role in roles:
+            UserRole.objects.create(user=user,role=role)
+
+    return {'code':200,'msg':'操作成功'}
+
+
+#修改用户
+@csrf_exempt
+@require_POST
+def update_user(request):
+    """修改用户信息"""
+    try:
+        #接收参数
+        data = request.POST.dict()
+
+        id = data.pop('id')
+        user = User.objects.get(id=id)
+        username = data.get('username')
+        #如果用户名被更改，判断用户名是否存在
+        if username and username != user.username:
+            User.objects.get(username=username)
+            return JsonResponse({'code':200,'msg':'用户名已存在，请重新添加'})
+
+    except User.DoesNotExist as e:
+        pass
+
+
+    try:
+        #如果邮箱被更改，判断邮箱是否存在
+        email = data.get('email')
+        if email and email != user.email:
+            User.objects.get(email=email)
+            return  JsonResponse({'code':200,'msg':'邮箱已存在，请重新添加'})
+    except User.DoesNotExist as e:
+        pass
+
+
+    role_ids = data.pop('select')
+    """
+    # 删除所有该用户的角色 
+    UserRole.objects.filter(user__id=id).delete() 
+    if len(role_ids) > 0: 
+        # 修改用户角色中间表 
+        roles = Role.objects.filter(pk__in=role_ids.split(',')).all() 
+        for role in roles: 
+            UserRole.objects.create(user=user, role=role)
+    """
+    #修改数据
+    data['updateDate'] = datetime.now()
+    User.objects.filter(id=id).update(**data)
+    #修改用户角色中间表
+    result = create_userrole(role_ids,user)
+    return JsonResponse(result)
+
+
+#删除用户
+@csrf_exempt
+@require_POST
+def delete_user(request):
+    """删除用户信息"""
+    #接收参数
+    ids = request.POST.getlist('ids')
+    #逻辑删除
+    User.objects.filter(pk__in=ids).update(isValid=0, updateDate=datetime.now())
+    #删除用户所有角色
+    UserRole.objects.filter(user__id__in=ids).delete()
+
+    return JsonResponse({'code':200,'msg':'删除成功'})
 
 
 

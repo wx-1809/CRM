@@ -152,7 +152,7 @@
         miniTongji = layui.miniTongji;
 
     var options = {
-      iniUrl: "{% static 'api/init.json' %}",    // 初始化接口 {% url 'system:index_init' %}  {% static 'api/init.json' %}
+      iniUrl: "{% url 'system:index_init' %}",    // 初始化接口 {% url 'system:index_init' %}  {% static 'api/init.json' %}
       clearUrl: "{% static 'api/clear.json' %}", // 缓存清理接口
       urlHashLocation: true,      // 是否打开hash定位
       bgColorDefault: false,      // 主题默认配置

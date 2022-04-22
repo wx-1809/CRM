@@ -139,7 +139,7 @@
         },
         {
           "title": "用户管理",
-          "href": "",
+          "href": "user",
           "icon": "fa fa-users",
           "target": "_self"
         },
