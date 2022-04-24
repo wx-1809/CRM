@@ -1,0 +1,7 @@
+1.layumini下拉框列表内容
+示例如下：
+    <div class="layui-input-block">
+        <select name="">
+            <option value=""></option>
+        </select>
+    </div>
