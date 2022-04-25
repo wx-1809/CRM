@@ -54,15 +54,15 @@
   <div class="layui-form-item layui-row layui-col-xs12">
     <label class="layui-form-label">角色</label>
     <div class="layui-input-block">
-      <div id="roleIds">
-        <select name="roleIds" id="role_name">
+<!--      <div id="roleIds">-->
+        <select name="roleIds" id="roleIds">
           <option value="">请选择</option>
-          <option value="销售主管" {% if roleIds.user_name == '销售主管' %}selected{% endif %}>销售主管</option>
-          <option value="客户经理" {% if roleIds.user_name  == '客户经理' %}selected{% endif %}>客户经理</option>
-          <option value="技术经理" {% if roleIds.user_name  == '技术经理' %}selected{% endif %}>技术经理</option>
-          <option value="测试角色" {% if roleIds.user_name  == '测试角色' %}selected{% endif %}>测试角色</option>
+          <option value="1" {% if roleIds == '1' %}selected{% endif %}>销售主管</option>
+          <option value="2" {% if roleIds  == '2' %}selected{% endif %}>客户经理</option>
+          <option value="3" {% if roleIds  == '3' %}selected{% endif %}>技术经理</option>
+          <option value="4" {% if roleIds  == '4' %}selected{% endif %}>测试角色</option>
         </select>
-      </div>
+<!--      </div>-->
 
     </div>
   </div>

@@ -681,7 +681,7 @@ def select_role_for_user(request):
         id  = request.GET.get('id')
         if id:
             #查询用户所有角色
-            roleIds = UserRole.objects.values_list('role',flat=True).filter(user__id=id).all()
+            roleIds = UserRole.objects.values_list('role',flat=True).filter(user__id=id).all() #isequall=role_id
             userRole = Role.objects.values('id','roleName').filter(pk__in=roleIds).all()
             context['userRole'] = list(userRole)
 

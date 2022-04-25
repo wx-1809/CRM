@@ -1,7 +1,21 @@
 1.layumini下拉框列表内容
 示例如下：
     <div class="layui-input-block">
-        <select name="">
-            <option value=""></option>
+        <select name="" id="">
+            <option value="">xxxx</option>
         </select>
     </div>
+
+
+
+2.python 热加载---指的是只要内容更新就自动刷新保存
+
+
+3.mysql数据库的内容：
+   第一、确定安装版本：是压缩文件还是.exe文件；
+   第二、压缩方式的安装见下面链接：
+        https://blog.csdn.net/dream_an/article/details/51058710
+   第三、navicat的破解版本参考如下链接：
+        https://www.cnblogs.com/hhaostudy/p/15898030.html
+
+4.html中子路由的问题：
