@@ -85,20 +85,20 @@
         {
           field: 'createDate', width: 200, title: '创建时间', align: "center",
           templet: function (obj) {
-            if (obj.create_date == null || obj.create_date == undefined) {
+            if (obj.createDate == null || obj.createDate == undefined) {
               return '';
             } else {
-              return layui.util.toDateString(obj.create_date, 'yyyy-MM-dd HH:mm:ss');
+              return layui.util.toDateString(obj.createDate, 'yyyy-MM-dd HH:mm:ss');
             }
           }
         },
         {
           field: 'updateDate', width: 200, title: '修改时间', align: "center",
           templet: function (obj) {
-            if (obj.update_date == null || obj.update_date == undefined) {
+            if (obj.updateDate == null || obj.updateDate == undefined) {
               return '';
             } else {
-              return layui.util.toDateString(obj.update_date, 'yyyy-MM-dd HH:mm:ss');
+              return layui.util.toDateString(obj.updateDate, 'yyyy-MM-dd HH:mm:ss');
             }
           }
         },
