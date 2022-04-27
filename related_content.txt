@@ -20,3 +20,6 @@
         https://www.cnblogs.com/hhaostudy/p/15898030.html
 
 4.html中子路由的问题：
+    第一、确定根路由；
+    第二、在根路由调用哪个子路由，使用include()函数跳转子路由；
+    第三、在子路由中要写明具体的内容；

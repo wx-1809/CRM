@@ -1,9 +1,13 @@
+from datetime import datetime
+
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render
 
 # Create your views here.
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from customer.models import Customer
 
@@ -68,3 +72,98 @@ def select_customer_list(request):
 
 
 #新增或修改客户信息
+@csrf_exempt
+@xframe_options_exempt
+def create_or_update_customer(request):
+    """添加或修改客户信息"""
+    if request.method == 'GET':
+        # 客户主键
+        id = request.GET.get('id')
+        #如果客户主键存在，说明是打开修改客户信息页面
+        if id:
+            customer = Customer.objects.values().filter(id=id)
+            return render(request, 'customer/customer_add_update.html', customer[0])
+        else:
+            return render(request, 'customer/customer_add_update.html')
+
+    if request.method == 'POST':
+        try:
+            #接收参数
+            name = request.POST.get('name')
+            area = request.POST.get('area')
+            cusManager = request.POST.get('cusManager')
+            level = request.POST.get('level')
+            xyd = request.POST.get('xyd')
+            postCode = request.POST.get('postCode')
+            phone = request.POST.get('phone')
+            fax = request.POST.get('fax')
+            website = request.POST.get('website')
+            address = request.POST.get('address')
+            fr = request.POST.get('fr')
+            zczj = request.POST.get('zczj')
+            nyye = request.POST.get('nyye')
+            khyh = request.POST.get('khyh')
+            khzh = request.POST.get('khzh')
+            dsdjh = request.POST.get('dsdjh')
+            gsdjh = request.POST.get('gsdjh')
+
+            #添加或者修改数据
+            #如果存在主键，说明修改客户信息，不生成客户编号
+            id = request.POST.get('id')
+            c = None
+            if not id:
+                #KH+时间
+                khno = 'KH' + datetime.now().strftime('%Y%m%d%H%M%S')
+                #添加数据
+                Customer.objects.create(khno=khno, name=name, area=area, cusManager=cusManager, level=level, xyd=xyd,
+                                        postCode=postCode, phone=phone, fax=fax, website=website, address=address,
+                                        fr=fr, zczj=zczj, nyye=nyye, khyh=khyh, khzh=khzh, dsdjh=dsdjh, gsdjh=gsdjh)
+            else:
+                Customer.objects.filter(id=id).update(name=name, area=area, cusManager=cusManager, level=level,
+                                                xyd=xyd, postCode=postCode, phone=phone, fax=fax, website=website,
+                                                address=address, fr=fr, zczj=zczj, nyye=nyye, khyh=khyh, khzh=khzh,
+                                                      dsdjh=dsdjh, gsdjh=gsdjh, updateDate=datetime.now())
+            #返回提示信息
+            return JsonResponse({'code':200,'msg':'保存成功'})
+
+        except Exception as es:
+            return JsonResponse({'code':400, 'msg':'保存失败'})
+
+
+
+#删除客户信息
+@csrf_exempt
+@require_POST
+def delete_customer(request):
+    """根据主键删除客户信息"""
+    try:
+        id = request.POST.get('id')
+        #逻辑删除
+        Customer.objects.filter(pk=id).update(isValid=0, updateDate=datetime.now())
+        return JsonResponse({'code':200, 'msg':'删除成功'})
+        # pass
+    except Exception as e:
+        return JsonResponse({'code':400, 'msg':'删除失败'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

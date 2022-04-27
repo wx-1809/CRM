@@ -187,15 +187,17 @@
         openAddOrUpdateCustomerDialog(data.data.id);
       } else if (data.event == "del") { // 删除客户信息
         // 删除客户
+        deleteCustomer(data.data.id);
       }
     });
+
 
     /**
      * 打开添加/修改客户信息的对话框
      */
     function openAddOrUpdateCustomerDialog(id) {
       var title = "<h3>客户管理 - 添加客户信息</h3>";
-      var url = '';
+      var url = '{% url 'customer:create_or_update_customer' %}';
       // 判断id是否为空 （如果不为空，则为更新操作）
       if (id != null && id != '') {
         title = "<h3>客户管理 - 更新客户信息</h3>";
@@ -215,6 +217,7 @@
         maxmin: true
       });
     }
+
 
     /**
      * 打开指定客户的订单对话框
@@ -246,6 +249,36 @@
       });
     }
 
+    /**
+    *删除指定的客户信息
+    *@param id
+    **/
+    function deleteCustomer(id){
+      //弹出确认框，询问用户是否确认删除
+      layer.confirm('确认要删除该记录吗？', {icon:3,title:"客户管理"}, function(index){
+        //关闭确认框
+        layer.close(index);
+        //发送ajax请求，删除记录
+        $.ajax({
+          type: "POST",
+          url: "{% url 'customer:delete_customer' %}",
+          data: {id: id},
+          success: function(result){
+            //判断删除结果
+            if(result.code == 200){
+              //提示成功
+              layer.msg("删除成功！", {icon:6});
+              //刷新表格
+              t.reload();
+            }
+            else{
+              //提示失败
+              layer.msg(result.msg, {icon:5});
+            }
+          }
+        });
+      });
+    }
   });
 </script>
 </body>
