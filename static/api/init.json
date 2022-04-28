@@ -43,7 +43,7 @@
         },
         {
           "title": "客户流失管理",
-          "href": "",
+          "href": "customer/loss/index",
           "icon": "fa fa-user-times",
           "target": "_self"
         }
@@ -129,12 +129,6 @@
           "title": "账号审核",
           "href": "audit_account",
           "icon": "fa fa-user-plus",
-          "target": "_self"
-        },
-        {
-          "title": "字典管理",
-          "href": "",
-          "icon": "fa fa-book",
           "target": "_self"
         },
         {

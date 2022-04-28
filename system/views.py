@@ -520,6 +520,10 @@ def create_role(request):
     except Role.DoesNotExist as e:
         pass
 
+    #添加数据
+    Role.objects.create(**data)
+    return JsonResponse({'code':200, 'msg':'添加成功'})
+
 @csrf_exempt
 @require_POST
 def update_role(request):
@@ -623,7 +627,7 @@ def select_user(request):
         #查询
         #{‘模型属性名’：‘select DATE_FORMAT(数据库列名，‘’格式化样式)’}
         select = {'create_date':"select DATE_FORMAT(create_date,'%%Y-%%m-%%d %%H:%%i:%%s')",
-                  'update_date':"select DATE_FORMAT(create_date,'%%Y-%%m-%%d %%H:%%i:%%s')"}
+                  'update_date':"select DATE_FORMAT(update_date,'%%Y-%%m-%%d %%H:%%i:%%s')"}
         #如果后台使用格式化日期，必须将要格式化的列展示在values()参数中
         queryset = User.objects.extra(select=select).values('id','username','truename','email','phone',
                                                             'create_date','update_date').order_by('-id').all()
@@ -676,7 +680,7 @@ def select_role_for_user(request):
         #查询所有角色
         role = Role.objects.values('id','roleName').all().order_by('id')
         #返回数据
-        context = {'role':list(role)}
+        context = {'role': list(role)}
         #获取用户主键
         id  = request.GET.get('id')
         if id:
@@ -685,7 +689,7 @@ def select_role_for_user(request):
             userRole = Role.objects.values('id','roleName').filter(pk__in=roleIds).all()
             context['userRole'] = list(userRole)
 
-        return JsonResponse(context, safe=False)
+        return JsonResponse(context) #, safe=False name="roleIds"
     except Role.DoesNotExist as e:
         pass
 
