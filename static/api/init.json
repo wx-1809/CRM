@@ -17,13 +17,13 @@
       "child": [
         {
           "title": "营销机会管理",
-          "href": "",
+          "href": "sales/index",
           "icon": "fa fa-tty",
           "target": "_self"
         },
         {
           "title": "客户开发计划",
-          "href": "",
+          "href": "sales/cus_dev_plan/index",
           "icon": "fa fa-ellipsis-h",
           "target": "_self"
         }
@@ -57,31 +57,31 @@
       "child": [
         {
           "title": "服务创建",
-          "href": "",
+          "href": "serve/create/index",
           "icon": "fa fa-tachometer",
           "target": "_self"
         },
         {
           "title": "服务分配",
-          "href": "",
+          "href": "serve/assign/index",
           "icon": "fa fa-code-fork",
           "target": "_self"
         },
         {
           "title": "服务处理",
-          "href": "",
+          "href": "serve/handle/index",
           "icon": "fa fa-flash",
           "target": "_self"
         },
         {
           "title": "服务反馈",
-          "href": "",
+          "href": "serve/feedback/index",
           "icon": "fa fa-exclamation",
           "target": "_self"
         },
         {
           "title": "服务归档",
-          "href": "",
+          "href": "serve/archive/index",
           "icon": "fa fa-folder-o",
           "target": "_self"
         }
@@ -95,25 +95,25 @@
       "child": [
         {
           "title": "客户贡献分析",
-          "href": "",
+          "href": "report/contribute/index",
           "icon": "fa fa-bar-chart",
           "target": "_self"
         },
         {
           "title": "客户构成分析",
-          "href": "",
+          "href": "report/composition/index",
           "icon": "fa fa-cubes",
           "target": "_self"
         },
         {
           "title": "客户服务分析",
-          "href": "",
+          "href": "report/serve/index",
           "icon": "fa fa-coffee",
           "target": "_self"
         },
         {
           "title": "客户流失分析",
-          "href": "",
+          "href": "report/loss/index",
           "icon": "fa fa-user-times",
           "target": "_self"
         }

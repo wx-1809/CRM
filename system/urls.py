@@ -47,8 +47,9 @@ urlpatterns = [
     path('user/create/',views.create_user, name='create_user'),
     path('user/update/',views.update_user, name='update_user'),
     path('user/delete/',views.delete_user, name='delete_user'),
-    #
 
+    #添加营销与客户之间的关系的模板
+    path('customer_manager/',views.select_customer_manager,name='select_customer_manager'),
 
     #
     path('init/', views.index_init,name='index_init'),

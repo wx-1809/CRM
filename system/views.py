@@ -689,7 +689,7 @@ def select_role_for_user(request):
             userRole = Role.objects.values('id','roleName').filter(pk__in=roleIds).all()
             context['userRole'] = list(userRole)
 
-        return JsonResponse(context) #, safe=False name="roleIds"
+        return JsonResponse(context, safe=False) #name="roleIds"
     except Role.DoesNotExist as e:
         pass
 
@@ -894,8 +894,12 @@ def index_init(request):
     return JsonResponse(context)
 
 
+@require_GET
+def select_customer_manager(request):
+    """查询客户经理（指派人）"""
+    user_list = User.objects.values("id",'username','truename').filter(isValid=1).order_by('-id').all()
 
-
+    return JsonResponse(list(user_list), safe=False)
 
 
 

@@ -23,3 +23,14 @@
     第一、确定根路由；
     第二、在根路由调用哪个子路由，使用include()函数跳转子路由；
     第三、在子路由中要写明具体的内容；
+
+5.dbutil问题解决 dbutil在python的包中是没有的，是自己写好的文件；
+    缺少相应的文件，需要从相应的文件夹拷贝内容，如果连接数据库出现以下问题：
+        self.encoding = charset_by_name(self.charset).encoding
+        AttributeError: 'NoneType' object has no attribute 'encoding'
+       将’charset‘修改为 ‘utf-8’ 可解决问题；
+
+6.营销界面中开发计划中，添加计划项内容，点击添加成功，但是界面不显示的原因，数据库内容已增加，但是前端界面不显示，解决方法：
+
+
+7.

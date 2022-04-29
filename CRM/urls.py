@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('system.urls')),
     path('customer/', include('customer.urls')),
+    path('sales/', include('sales.urls')), #将sales应用添加到crm项目中；
 ]

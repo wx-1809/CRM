@@ -323,7 +323,7 @@ scheduler = BackgroundScheduler()
 # # 创建一个任务
 scheduler.add_job(create_customer_loss, 'interval', minutes=1)
 # # 启动任务
-# scheduler.start()
+scheduler.start()
 # 结束任务
 # scheduler.end()
 
