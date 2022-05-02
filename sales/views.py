@@ -306,7 +306,10 @@ def select_cus_dev_plan_list(request):
         # 获取客户营销机会主键
         saleChanceId = request.GET.get('saleChanceId')
         #查询
-        cdp_list = CusDevPlan.objects.values().filter(saleChance=saleChanceId).order_by('-id')
+        cdp_list = CusDevPlan.objects.extra(select={'planDate': 'date_format(plan_date, "%%Y-%%m-%%d")'}).\
+                                            values('id', 'planItem', 'planDate', 'exeAffect', 'saleChance').\
+                                            filter(saleChance=saleChanceId).order_by('-id').all()
+        # queryset = CustomerServe.objects.extra(select=select_dict).values().order_by('-id').all()
         #初始化分页对象
         p = Paginator(cdp_list, page_size)
         #获取指定页数的数据

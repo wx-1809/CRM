@@ -7,7 +7,7 @@
     </div>
 
 修改：user-->add_update.html-->角色部分
-
+    参考serve--->create.html中的内容---views-->select_serve_list;  create_serve---serveType
 
 2.python 热加载---指的是只要内容更新就自动刷新保存
 
@@ -31,6 +31,17 @@
        将’charset‘修改为 ‘utf-8’ 可解决问题；
 
 6.营销界面中开发计划中，添加计划项内容，点击添加成功，但是界面不显示的原因，数据库内容已增加，但是前端界面不显示，解决方法：
+    解决办法：
+
+    serve:select_serve_list:queryset
+    sales:select_cus_dev_plan_list:cdp_list
 
 
-7.
+    服务分配中有问题，serve中的views中的update_serve  参考客户管理界面-->客户信息管理中编辑界面的数据读取
+    角色管理中---添加角色--》创建时间的问题；
+
+7. 函数查询：
+    ModelManager：
+    xframe_options_exempt:
+    require_GET:
+    csrf_exempt:
