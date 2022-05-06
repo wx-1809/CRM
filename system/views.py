@@ -423,9 +423,9 @@ def update_module(request):
     except Module.DoesNotExist as e:
         pass
 
-    #添加数据
-    Module.objects.create(**data)
-    return JsonResponse({'code':200,'msg':'添加成功'})
+    #修改数据
+    Module.objects.filter(pk=id).update(**data, updateDate=datetime.now())
+    return JsonResponse({'code':200,'msg':'修改成功'})
 
 
 #删除模块
@@ -446,6 +446,7 @@ def delete_module(request):
     #删除模块
     Module.objects.filter(pk=id).delete()
     return JsonResponse({'code':200,'msg':'删除成功'})
+
 
 #角色管理----查询角色
 @xframe_options_exempt
@@ -470,7 +471,7 @@ def select_role(requset):
         queryset = Role.objects.extra(select=select).values('id','roleName','roleRemark',
                                     'createDate','updateDate').order_by('id').all()
         #待条件查询
-        roleName = requset.GET.get('rolename')
+        roleName = requset.GET.get('roleName')
         if roleName:
             queryset = queryset.filter(roleName__icontains=roleName)
         #初始化分页对象
@@ -501,7 +502,7 @@ def role_create_or_update(request):
     id = request.GET.get('id')
     context = None
     if id:
-        context = {'role':Role.objects.get(pk=id)}
+        context = {'role': Role.objects.get(pk=id)}
     return render(request, 'role/add_update.html', context)
 
 @csrf_exempt
@@ -521,6 +522,7 @@ def create_role(request):
         pass
 
     #添加数据
+    data['createDate'] = datetime.now()
     Role.objects.create(**data)
     return JsonResponse({'code':200, 'msg':'添加成功'})
 
@@ -541,8 +543,6 @@ def update_role(request):
             #判断是否存在
             Role.objects.get(roleName=roleName)
             return JsonResponse({'code':400,'msg':'角色名已存在'})
-
-        # pass
     except Role.DoesNotExist as e:
         pass
 
@@ -550,6 +550,20 @@ def update_role(request):
     data['updateDate'] = datetime.now()
     Role.objects.filter(pk=id).update(**data)
     return JsonResponse({'code':200,'msg':'修改成功'})
+
+@csrf_exempt
+@require_POST
+def delete_role(request):
+    """删除角色信息"""
+    # 接收参数
+    data = request.POST.dict()
+    id = data.pop('id')
+
+    Role.objects.filter(pk=id).update(isValid=0, updateDate=datetime.now())
+    UserRole.objects.filter(user__id__in=id).update(isValid=0, updateDate=datetime.now())
+    
+    return JsonResponse({'code':200,'msg':'删除成功'})
+
 
 
 #角色授权---角色内容
@@ -600,12 +614,12 @@ def role_relate_module(request):
         module = Module.objects.filter(pk__in=module_checked_id.split(',')).all() #以‘,’分隔获得相应的内容；
         #循环插入数据
         for m in module:
-            Permission.objects.create(role=role,module=m)
-        # return JsonResponse({'code':200,'msg':'操作成功'})
-        return JsonResponse(Message(msg='操作成功').result())
+            Permission.objects.create(role=role, module=m)
+        return JsonResponse({'code':200,'msg':'操作成功'})
+        # return JsonResponse(Message(msg='操作成功').result())
     except Exception as e:
-        # return JsonResponse({'code':400, 'msg':'操作失败'})
-        return JsonResponse(Message(code=400, msg='操作失败').result())
+        return JsonResponse({'code':400, 'msg':'操作失败'})
+        # return JsonResponse(Message(code=400, msg='操作失败').result())
 
 
 #用户管理
@@ -689,7 +703,7 @@ def select_role_for_user(request):
             userRole = Role.objects.values('id','roleName').filter(pk__in=roleIds).all()
             context['userRole'] = list(userRole)
 
-        return JsonResponse(context, safe=False) #name="roleIds"
+        return JsonResponse(context, safe=False)
     except Role.DoesNotExist as e:
         pass
 
@@ -738,7 +752,7 @@ def create_user(request):
             UserRole.objects.create(user=user, role=role)
     """
     #插入用户角色中间表
-    result = create_userrole(role_ids,user,is_create=True)
+    result = create_userrole(role_ids, user, is_create=True)
 
     return JsonResponse(result)
 
@@ -751,7 +765,7 @@ def create_userrole(role_ids,user,is_create=False):
     if len(role_ids) > 0:
         roles = Role.objects.filter(pk__in=role_ids.split(',')).all()
         for role in roles:
-            UserRole.objects.create(user=user,role=role)
+            UserRole.objects.create(user=user, role=role)
 
     return {'code':200,'msg':'操作成功'}
 

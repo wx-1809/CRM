@@ -26,7 +26,7 @@ urlpatterns = [
     path('module/create/',views.create_module, name='create_module'),
     path('module/update/',views.update_module,name='update_module'),
     #删除模块
-    path('module/delete',views.delete_module,name='delete_module'),
+    path('module/delete/',views.delete_module,name='delete_module'),
     #角色管理--查询角色
     path('role/',views.role_index,name='role_index'),
     path('role/list/',views.select_role,name='select_role'),
@@ -34,6 +34,7 @@ urlpatterns = [
     path('role/create_or_update/',views.role_create_or_update,name='role_create_or_update'),
     path('role/create/',views.create_role,name='create_role'),
     path('role/update/',views.update_role,name='update_role'),
+    path('role/delete/',views.delete_role,name='delete_role'),
     #角色管理--授权
     path('role/grant/',views.role_grant,name='role_grant'),
     path('role/module/',views.select_role_module,name='select_role_module'),

@@ -54,16 +54,7 @@
   <div class="layui-form-item layui-row layui-col-xs12">
     <label class="layui-form-label">角色</label>
     <div class="layui-input-block">
-      <div id="roleIds">
-<!--        <select name="roleName" id="roleIds">-->
-<!--          <option value="0">请选择</option>-->
-<!--          <option value="2" {% if roleIds == '2' %}selected{% endif %}>{{ roleName }}</option>-->
-<!--          <option value="3" {% if roleIds == '3' %}selected{% endif %}>客户经理</option>-->
-<!--          <option value="4" {% if roleIds == '4' %}selected{% endif %}>技术经理</option>-->
-<!--          <option value="1" {% if roleIds == '16' %}selected{% endif %}>测试角色</option>-->
-<!--        </select>-->
-      </div>
-
+      <div id="roleIds"></div>
     </div>
   </div>
 
@@ -149,9 +140,9 @@
     });
 
     /**
-     * 加载客户名称的下拉框 /user/role/
+     * 加载客户名称的下拉框
      */
-    var id = $("[name='id']").val(); //当前的user_id
+    var id = $("[name='id']").val();
     var url = "";
     if (id != "") {
       url = "/user/role/?id=" + id;
