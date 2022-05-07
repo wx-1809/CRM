@@ -738,12 +738,16 @@ def create_user(request):
     #加密密码
     #使用md5加密
     data['password'] = md5('123456'.encode(encoding='utf-8')).hexdigest()
+    print(data)
     # role_ids = data.pop('select')
     # print('11111111111111111111111111111111111111111111111111111')
     # print(data.pop('select'))
     role_ids = data.pop('select') #有bug
+    # print("role_ids:" % role_ids)
     #添加数据
     user = User.objects.create(**data)
+    # print("user: " % user)
+    # User.objects.create(**data)
     """
     #插入用户角色中间表
     if len(role_ids) > 0:
@@ -755,6 +759,7 @@ def create_user(request):
     result = create_userrole(role_ids, user, is_create=True)
 
     return JsonResponse(result)
+    # return JsonResponse({'code': 200, 'msg': '创建成功'})
 
 def create_userrole(role_ids,user,is_create=False):
     """添加用户角色中间表"""

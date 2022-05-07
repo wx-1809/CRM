@@ -39,6 +39,8 @@ urlpatterns = [
     path('role/grant/',views.role_grant,name='role_grant'),
     path('role/module/',views.select_role_module,name='select_role_module'),
     path('role/grant/add/',views.role_relate_module,name='role_relate_module'),
+
+
     #用户管理--查询用户
     path('user/',views.user_index, name='user_index'),
     path('user/list/',views.select_user,name='select_user'),
@@ -46,6 +48,7 @@ urlpatterns = [
     path('user/create_or_update/',views.user_create_or_update,name='user_create_or_update'),
     path('user/role/',views.select_role_for_user,name='select_role_for_user'),
     path('user/create/',views.create_user, name='create_user'),
+
     path('user/update/',views.update_user, name='update_user'),
     path('user/delete/',views.delete_user, name='delete_user'),
 
