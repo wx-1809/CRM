@@ -54,12 +54,12 @@
   <div class="layui-form-item layui-row layui-col-xs12">
     <label class="layui-form-label">角色</label>
     <div class="layui-input-block">
-<!--      <div id="roleIds">-->
-        <select name="roleIds" id="roleIds">
-          <option value="">请选择</option>
-          <option value="1">系统管理员</option>
-        </select>
-<!--      </div>-->
+      <div id="roleIds">
+<!--        <select name="roleIds" id="roleIds">-->
+<!--          <option value="">请选择</option>-->
+<!--          <option value="1">系统管理员</option>-->
+<!--        </select>-->
+      </div>
     </div>
   </div>
 
@@ -173,7 +173,7 @@
               name: 'roleName',
               value: 'id',
             },
-            data: data.roleName
+            data: data.role
           });
           // 如果是修改用户且用户拥有角色则进行赋值
           if (data.userRole != null) {

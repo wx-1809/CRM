@@ -42,8 +42,8 @@ class Role(models.Model):
     roleName = models.CharField(max_length=20, db_column='role_name')
     roleRemark = models.CharField(max_length=120, db_column='role_remark')
     isValid = models.IntegerField(db_column='is_valid',default=1)
-    createDate = models.DateTimeField(db_column='create_date')
-    updateDate = models.DateTimeField(max_length=20,db_column='update_date',auto_now_add=True)#, default=datetime.now() , default=datetime.now()
+    createDate = models.DateTimeField(db_column='create_date',auto_now_add=True)
+    updateDate = models.DateTimeField(max_length=20,db_column='update_date')#, default=datetime.now() , default=datetime.now()
     permissions = models.ManyToManyField(Module, through='Permission', through_fields=('role','module'))
 
     objects = ModelManager()
