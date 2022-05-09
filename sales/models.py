@@ -56,8 +56,8 @@ class CusDevPlan(models.Model):
     # 执行效果
     exeAffect = models.CharField(max_length=100, db_column='exe_affect')
 
-    isValid = models.IntegerField(db_column='is_valid')
-    createDate = models.DateTimeField(db_column='create_date')
+    isValid = models.IntegerField(db_column='is_valid', default=1)
+    createDate = models.DateTimeField(db_column='create_date', auto_now_add=True)
     updateDate = models.DateTimeField(max_length=20, db_column='update_date')
 
     objects = ModelManager()

@@ -291,6 +291,7 @@ def cus_dev_plan_index_detail(request):
     # saleChanceId = request.GET.get('id')
     # 根据主键查询营销机会
     sc = SaleChance.objects.get(pk=saleChanceId)
+    print(sc)
     context = {'sc': sc}
 
     return render(request, 'sales/cus_dev_plan_detail.html', context)
@@ -302,13 +303,13 @@ def select_cus_dev_plan_list(request):
         # 获取第几页
         page_num = request.GET.get('page', 1)
         # 获取每页多少条
-        page_size = request.GET.get('limit')
+        page_size = request.GET.get('limit',10)
         # 获取客户营销机会主键
         saleChanceId = request.GET.get('saleChanceId')
         #查询
         cdp_list = CusDevPlan.objects.extra(select={'planDate': 'date_format(plan_date, "%%Y-%%m-%%d")'}).\
                                             values('id', 'planItem', 'planDate', 'exeAffect', 'saleChance').\
-                                            filter(saleChance=saleChanceId).order_by('-id').all()
+                                            filter(saleChance=saleChanceId).order_by('id')
         # queryset = CustomerServe.objects.extra(select=select_dict).values().order_by('-id').all()
         #初始化分页对象
         p = Paginator(cdp_list, page_size)
@@ -337,13 +338,13 @@ def create_or_update_cus_dev_plan(request):
     """跳转客户开发计划添加/修改页面"""
     #获取营销机会主键
     saleChanceId = request.GET.get('saleChanceId')
-    context = {'saleChanceId': saleChanceId}
 
     #获取客户开发计划主键
     id = request.GET.get('id')
+    context = {'saleChanceId': saleChanceId}
+
     if id:
         cusDevPlan = CusDevPlan.objects.get(pk=id)
-        context['id'] = id
         context['cusDevPlan'] = cusDevPlan
 
     return render(request, 'sales/cus_dev_plan_add_update.html', context)
@@ -365,6 +366,7 @@ def create_cus_dev_plan(request):
     #获取营销机会对象
     sc = SaleChance.objects.get(pk=saleChanceId)
     data['saleChance'] = sc
+    # data['']
 
     # 添加客户开发计划
     CusDevPlan.objects.create(**data)
@@ -372,6 +374,7 @@ def create_cus_dev_plan(request):
     sc.devResult = 1
     sc.updateDate = datetime.now()
     sc.save()
+    # print("内容" % data)
 
     return JsonResponse({'code': 200, 'msg': '添加成功'})
 

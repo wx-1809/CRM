@@ -25,9 +25,7 @@
 
 6.营销界面中开发计划中，添加计划项内容，点击添加成功，但是界面不显示的原因，数据库内容已增加，但是前端界面不显示，解决方法：
     解决办法：
-
-    serve:select_serve_list:queryset
-    sales:select_cus_dev_plan_list:cdp_list
+        查看模型中数据库的创建中，缺少is_valid字段的定义，导致前端无法显示，需定义ia_valid默认为1，创建时间自动获取，也需要添加；
 
 
     服务分配中有问题，serve中的views中的update_serve  参考客户管理界面-->客户信息管理中编辑界面的数据读取

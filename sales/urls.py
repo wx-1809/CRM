@@ -23,6 +23,6 @@ urlpatterns = [
     path('cus_dev_plan/update/',views.update_cus_dev_plan,name='update_cus_dev_plan'),
     path('cus_dev_plan/delete/',views.delete_cus_dev_plan,name='delete_cus_dev_plan'),
     #
-    # path('cus_dev_plan/dev_result/',views.update_dev_result,name='update_dev_result'),
+    path('cus_dev_plan/dev_result/',views.update_dev_result,name='update_dev_result'),
 
 ]
