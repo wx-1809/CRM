@@ -9,6 +9,8 @@ from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
+
+from CRM.common import permission_required
 from dbutil import pymysql_pool
 from django.db import connection
 
@@ -39,10 +41,17 @@ from customer.models import Customer, LinkMan
 from sales.models import SaleChance, CusDevPlan
 
 
+@permission_required('1010')
 @xframe_options_exempt
 @require_GET
 def sales_index(request):
     """跳转营销管理首页"""
+    #营销机会管理权限值是1010
+    #第一种
+    #从session中获取权限值进行比较
+    # user_permissions = request.session.get('user_permission')
+    # if not user_permissions or '1010' not in user_permissions:
+    #     return render(request, '404.html', {'msg' : '对不起，您无权限访问'})
     return render(request, 'sales/sale_chance.html')
 
 

@@ -42,7 +42,7 @@ class URLMiddleware(MiddlewareMixin):
 
 class CustomSystemException(Exception):
     """自定义异常类"""
-    def __init__(self, code=400,msg='系统错误，请联系管理员'):
+    def __init__(self, code=400, msg='系统错误，请联系管理员'):
         self.code = code
         self.msg = msg
 
@@ -55,16 +55,17 @@ class ExceptionMiddleware(MiddlewareMixin):
     """全局异常处理中间件"""
 
     @xframe_options_exempt
-    def process_exception(self,request,excepiton):
+    def process_exception(self, request, exception):
         #如果是自定义异常
-        if isinstance(excepiton, CustomSystemException):
-            result = Message(code=excepiton.code, msg=excepiton.msg).result()
-        elif isinstance(excepiton,Exception) or isinstance(excepiton,BaseException):
+        if isinstance(exception, CustomSystemException):
+            result = Message(code=exception.code, msg=exception.msg).result()
+        elif isinstance(exception,Exception) or isinstance(exception,BaseException):
             #如果是python系统异常
             #系统出现异常，将异常信息存入数据库或者是日志记录文件，方便维护查看
             result = Message(code=400, msg='系统错误，请联系管理员').result()
 
         #判断请求是否是ajax
+        if request.is_ajax(): #request.is_ajax()
             return JsonResponse(result)
         else:
             return  render(request,'404.html',result)
@@ -73,9 +74,9 @@ class Message(object):
     """公共返回对象"""
 
     def __init__(self, code=200, msg='success',obj=None):
-        self.code=code,
-        self.msg =msg,
-        self.obj=obj
+        self.code = code,
+        self.msg = msg,
+        self.obj = obj
 
     def result(self):
         result = {'code':self.code[0],'msg':self.msg[0]}
@@ -83,4 +84,40 @@ class Message(object):
             result['obj'] = self.obj[0]
 
         return result
+
+
+def permission_required(permission):
+    """自定义views的权限校验装饰器"""
+    def decorator(func):
+        #权限验证
+        def warpper(request,*args, **kwargs):
+            """检查是否有权限"""
+            user_permission = request.session.get('user_permission')
+            if not user_permission or permission not in user_permission:
+                raise CustomSystemException.eroor("没有操作权限，请联系管理员")
+                # return render(request, '404.html', {'msg': '对不起，您无权限访问'})
+            else:
+                #当前有用户登录，正常跳转
+                return func(request, *args, **kwargs)
+
+        return warpper
+
+    return decorator
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

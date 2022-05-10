@@ -29,7 +29,7 @@
 
 
     服务分配中有问题，serve中的views中的update_serve  参考客户管理界面-->客户信息管理中编辑界面的数据读取
-        解决办法：
+        解决办法：后端内容缺少对数据库内容的筛选，导致无法成功的显示出所需内容；
 
 
     角色管理中---添加角色--》创建时间的问题:（已解决）
@@ -39,5 +39,16 @@
     ModelManager：
 
     xframe_options_exempt:
+
     require_GET:
+
     csrf_exempt:
+
+    require_POST
+
+8. layui框架中 init.json文件修改内容后，前端界面没有变化，且无法链接的原因是由于浏览器缓存的原因;
+    解决办法：清除缓存 快捷键：ctrl+shift+delete;
+
+
+9.出现'WSGIRequest' object has no attribute 'is_ajax'；
+   解决办法：版本问题，建议django版本降低为3.2.2的版本，4.0版本是不支持request.is_ajax()的;

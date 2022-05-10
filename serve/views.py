@@ -41,7 +41,7 @@ def select_serve_list(request):
         page_size = request.GET.get('limit', 10)
         # 查询
         select_dict = {'assignTime': 'select DATE_FORMAT(assign_time, "%%Y-%%m-%%d %%H:%%i:%%s")',
-                       'serviceProceTime': 'select DATE_FORMAT(service_proce_time, "%%Y- %%m-%%d %%H:%%i:%%s")',
+                       'serviceProceTime': 'select DATE_FORMAT(service_proce_time, "%%Y-%%m-%%d %%H:%%i:%%s")',
                        'createDate': 'select DATE_FORMAT(create_date, "%%Y-%%m-%%d %%H:%%i:%%s")',
                        'updateDate': 'select DATE_FORMAT(update_date, "%%Y-%%m-%%d %%H:%%i:%%s")'}
         queryset = CustomerServe.objects.extra(select=select_dict).values().order_by('-id').all()
@@ -92,8 +92,11 @@ def serve_workflow(request,template):
 
     #获取服务主键
     id = request.GET.get('id')
+    
+    if id:
+        context['cs'] = CustomerServe.objects.get(pk=id)
 
-    return render(request,'serve/%s_serve.html'%template, context)
+    return render(request,'serve/%s_serve.html' % template, context)
 
 #服务创建
 @csrf_exempt
@@ -122,6 +125,7 @@ def update_serve(request):
     #如果是 2 已分配， 修改分配时间
     if state == '2':
         serve['assignTime'] = datetime.now()
+    #如果是3 已处理，修改处理时间
     elif state == '3':
         serve['serviceProceTime'] = datetime.now()
 

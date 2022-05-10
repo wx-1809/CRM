@@ -38,7 +38,7 @@ class CustomerServe(models.Model):
     myd = models.CharField(db_column='myd', max_length=50)
     isValid = models.IntegerField(db_column='is_valid', default=1)
     createDate = models.DateTimeField(db_column='create_date', auto_now_add=True)
-    updateDate = models.DateTimeField(db_column='update_date', auto_now_add=True)
+    updateDate = models.DateTimeField(db_column='update_date')#, auto_now_add=True
 
     objects = ModelManager()
 

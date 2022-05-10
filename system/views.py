@@ -184,7 +184,7 @@ def audit_account(request):
             ids = request.POST.get('ids')
             state = request.POST.get('state')
             #修改状态信息，0未审核 1审核通过 -1黑名单
-            User.objects.filter(id__in=ids).update(state=state, updateDate=datetime.now())
+            User.objects.filter(pk=ids).update(state=state, updateDate=datetime.now())
 
             return JsonResponse({'code':200, 'msg':'操作成功'})
         except Exception as e:
@@ -614,11 +614,11 @@ def role_relate_module(request):
         #循环插入数据
         for m in module:
             Permission.objects.create(role=role, module=m)
-        return JsonResponse({'code':200,'msg':'操作成功'})
-        # return JsonResponse(Message(msg='操作成功').result())
+        # return JsonResponse({'code':200,'msg':'操作成功'})
+        return JsonResponse(Message(msg='操作成功').result())
     except Exception as e:
-        return JsonResponse({'code':400, 'msg':'操作失败'})
-        # return JsonResponse(Message(code=400, msg='操作失败').result())
+        # return JsonResponse({'code':400, 'msg':'操作失败'})
+        return JsonResponse(Message(code=400, msg='操作失败').result())
 
 
 #用户管理
