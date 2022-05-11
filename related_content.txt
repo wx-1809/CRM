@@ -36,15 +36,25 @@
         解决办法：数据库定义字段时，创建和更新的时间的获取错误，直接修改就好。
 
 7. 函数查询：
-    ModelManager：
+    重新定义的类别ModelManager：
+        依赖于models.Manager模型:与数据库交互的接口；自定义模型管理器类
+            流程：
+                定义类别(models.Manager):
+                    定义get_queryset(self):
+                        return super().ge_queryset().filter(isValid=1)或者是
+                        return super(ModelManager, self).ge_queryset().filter(name='xxxx')
 
-    xframe_options_exempt:
 
-    require_GET:
+    xframe_options_exempt:只要存在.html界面的跳转，需此方法存在
+        主要是不同子页面的跳转，与setting中的MIDDLEWARE的'django.middleware.clickjacking.XFrameOptionsMiddleware'调用内容；
 
-    csrf_exempt:
+    csrf_exempt: 注解来标识一个视图可以被跨域访问;
+        某个视图函数不需要进行csrf校验;
+        直接加就行;
 
-    require_POST
+    require_GET: 表示只接受 get 请求，如果是 post 等其他请求，则报错
+
+    require_POST:表示只接受 post 请求，如果是 get 等其他请求，则报错
 
 8. layui框架中 init.json文件修改内容后，前端界面没有变化，且无法链接的原因是由于浏览器缓存的原因;
     解决办法：清除缓存 快捷键：ctrl+shift+delete;
@@ -52,3 +62,9 @@
 
 9.出现'WSGIRequest' object has no attribute 'is_ajax'；
    解决办法：版本问题，建议django版本降低为3.2.2的版本，4.0版本是不支持request.is_ajax()的;
+
+10.写该项目中所用到的参考文件：
+    python-django中数据库的使用教程，可参考下列文档：
+        https://blog.csdn.net/chengxuyuan_110/article/details/81102300
+    django项目安装过程：
+        https://blog.csdn.net/qq_39578545/article/details/107968460

@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 class ModelManager(models.Manager):
 
+    # 在这里，我修改了默认的查询集get_queryset（其实查询集all,就是调用的get_queryset）
     def get_queryset(self):
         return super(ModelManager, self).get_queryset().filter(isValid=1)
 
