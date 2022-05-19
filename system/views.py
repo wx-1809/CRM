@@ -4,6 +4,7 @@ from datetime import datetime
 from hashlib import md5
 
 from captcha.image import ImageCaptcha
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -141,7 +142,7 @@ def generate_code(code_len=4):
 def generate_captcha(request):
     """生成图形验证码"""
     #生成字母加数字组合验证码字符串
-    code = generate_code();
+    code = generate_code()
     #初始化图形验证码对象
     image = ImageCaptcha()
     #生成图像验证码，将图片保存到内存中
@@ -156,6 +157,7 @@ def generate_captcha(request):
 
 
 #首页编写
+# @login_required
 @require_GET
 def index(request):
     """首页"""

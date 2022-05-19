@@ -68,3 +68,11 @@
         https://blog.csdn.net/chengxuyuan_110/article/details/81102300
     django项目安装过程：
         https://blog.csdn.net/qq_39578545/article/details/107968460
+
+11.登录界面不能跳转到首页的原因，是因为不能加入网站的内容；将
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" charset="utf-8"></script>
+
+    替换为如下内容即可：
+    <script src="{% static 'lib/jquery-3.4.1/jquery-3.6.0.min.js' %}" charset="utf-8"></script>
+    <script src="{% static 'lib/jquery-3.4.1/jquery.cookie.min.js' %}" charset="utf-8"></script>
