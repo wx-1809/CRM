@@ -251,10 +251,11 @@ def settings(request):
         #获取id
         id = session_user['id']
         #根据id查询用户信息
-        user = User.objects.values('id','username','password','email','phone').filter(isValid=1,id=id)
+        user = User.objects.values('id','username','truename','email','phone').filter(isValid=1,id=id)
 
         #跳转基本资料页面
         return render(request,'settings.html',user[0])
+
     if request.method == 'POST':
         try:
             #获取基本资料
@@ -269,14 +270,15 @@ def settings(request):
                 if email and email != user.email:
                     User.objects.get(email=email)
                     return JsonResponse({'code':400,'msg':'邮箱已存在，请重新添加'})
-            except Exception as e:
+            except User.DoesNotExist as e:
                 #如果进入异常，说明邮箱不存在可以使用
                 pass
             #根据id查询，然后修改基本资料
-            User.object.filter(id=id).update(truename=truename,
+            User.objects.filter(id=id).update(truename=truename,
                                              email=email,
                                              phone=phone,
                                              updateDate=datetime.now())
+            # print(User.objects.values)
             return JsonResponse({'code':200,'msg':'操作成功'})
 
         except Exception as e:

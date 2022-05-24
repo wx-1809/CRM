@@ -29,26 +29,28 @@
         <label class="layui-form-label required">账号</label>
         <div class="layui-input-block">
           <input type="text" id="username" name="username" readonly="readonly" class="layui-input"
-                  value="{% if username %}{{ username }}{% endif %}">
+                 value="{% if username %}{{ username }}{% endif %}">
         </div>
-      </div>菜单
+      </div>
       <div class="layui-form-item">
         <label class="layui-form-label">真实姓名</label>
         <div class="layui-input-block">
-          <input type="text" id="truename" name="truename" placeholder="请输入真实姓名" class="layui-input">
+          <input type="text" id="truename" name="truename" placeholder="请输入真实姓名" class="layui-input"
+                 value="{% if truename %}{{ truename }}{% endif %}">
         </div>
       </div>
       <div class="layui-form-item">
         <label class="layui-form-label">邮箱</label>
         <div class="layui-input-block">
-          <input type="email" id="email" name="email" placeholder="请输入邮箱" class="layui-input">
+          <input type="email" id="email" name="email" placeholder="请输入邮箱" class="layui-input"
+                 value="{% if email %}{{ email }}{% endif %}">
         </div>
       </div>
       <div class="layui-form-item">
         <label class="layui-form-label required">手机</label>
         <div class="layui-input-block">
           <input type="number" id="phone" name="phone" placeholder="请输入手机" class="layui-input"
-                 lay-verify="required" lay-reqtext="手机不能为空">
+                 lay-verify="required" lay-reqtext="手机不能为空" value="{% if phone %}{{ phone }}{% endif %}">
         </div>
       </div>
       <div class="layui-form-item">
@@ -60,8 +62,10 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" charset="utf-8"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" charset="utf-8"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" charset="utf-8"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" charset="utf-8"></script>-->
+<script src="{% static 'lib/jquery-3.4.1/jquery-3.6.0.min.js' %}" charset="utf-8"></script>
+<script src="{% static 'lib/jquery-3.4.1/jquery.cookie.min.js' %}" charset="utf-8"></script>
 <script src="{% static 'lib/layui-v2.6.3/layui.js' %}" charset="utf-8"></script>
 <script>
   layui.use(['jquery'], function () {
@@ -94,9 +98,6 @@
       }
     });
   }
-
 </script>
-
-
 </body>
 </html>

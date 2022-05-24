@@ -41,7 +41,7 @@ from customer.models import Customer, LinkMan
 from sales.models import SaleChance, CusDevPlan
 
 
-@permission_required('1010')
+# @permission_required('1010')
 @xframe_options_exempt
 @require_GET
 def sales_index(request):
